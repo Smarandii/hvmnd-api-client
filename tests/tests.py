@@ -1,23 +1,21 @@
 import os
 import unittest
 from dotenv import load_dotenv
-from client import APIClient
+from hvmnd_api_client import APIClient
 
 
 class TestAPIClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Load environment variables from .env file
         load_dotenv()
         base_url = os.getenv('API_BASE_URL')
         if not base_url:
             raise ValueError("API_BASE_URL environment variable not set in .env file")
         cls.client = APIClient(base_url=base_url)
 
-        # Create a test user (ensure this user doesn't affect real data)
-        cls.test_user_id = 231584958  # Use a unique Telegram ID for testing
+        cls.telegram_user_id = 231584958
         cls.test_user_data = {
-            'telegram_id': cls.test_user_id,
+            'telegram_id': cls.telegram_user_id,
             'first_name': 'Test',
             'last_name': 'User',
             'username': 'testuser',
@@ -47,7 +45,7 @@ class TestAPIClient(unittest.TestCase):
     def test_create_or_update_user(self):
         """Test creating or updating a user."""
         user_data = {
-            'telegram_id': self.test_user_id,
+            'telegram_id': self.telegram_user_id,
             'first_name': 'Updated',
             'last_name': 'User',
             'username': 'updateduser',
@@ -58,24 +56,18 @@ class TestAPIClient(unittest.TestCase):
         self.assertIsInstance(result, dict)
         self.assertEqual(result['first_name'], 'Updated')
 
-    def test_create_payment_ticket(self):
-        """Test creating a payment ticket."""
-        result = self.client.create_payment_ticket(user_id=self.test_user_id, amount=50.0)
-        self.assertIsInstance(result, dict)
-        self.assertIn('payment_ticket_id', result)
-        self.payment_ticket_id = result['payment_ticket_id']
-
     def test_get_payments(self):
         """Test retrieving payments."""
         payments = self.client.get_payments(limit=5)
         self.assertIsInstance(payments, list)
         self.assertLessEqual(len(payments), 5)
 
-    def test_complete_and_cancel_payment(self):
-        """Test completing a payment."""
-        # Create a new payment ticket
-        result = self.client.create_payment_ticket(user_id=self.test_user_id, amount=25.0)
+    def test_create_complete_and_cancel_payment(self):
+        result = self.client.create_payment_ticket(user_id=1, amount=50.0)
+        self.assertIsInstance(result, dict)
+        self.assertIn('payment_ticket_id', result)
         payment_ticket_id = result['payment_ticket_id']
+
         # Complete the payment
         result = self.client.complete_payment(id_=payment_ticket_id)
         self.assertIsInstance(result, dict)

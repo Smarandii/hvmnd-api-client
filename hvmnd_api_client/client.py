@@ -2,7 +2,7 @@ import requests
 
 
 class APIClient:
-    def __init__(self, base_url):
+    def __init__(self, base_url: str):
         """
         Initialize the API client.
 
@@ -11,13 +11,20 @@ class APIClient:
         """
         self.base_url = base_url
 
-    def get_nodes(self, id_=None, renter=None, status=None, any_desk_address=None, software=None):
+    def get_nodes(
+        self,
+        id_: int = None,
+        renter: int = None,
+        status: str = None,
+        any_desk_address: str = None,
+        software: str = None
+    ):
         """
         Retrieve nodes based on provided filters.
 
         Parameters:
-            id_ (str): Node ID.
-            renter (str): Renter ID. If 'non_null', returns nodes with a non-null renter.
+            id_ (int): Node ID.
+            renter (int): Renter ID. If 'non_null', returns nodes with a non-null renter.
             status (str): Node status.
             any_desk_address (str): AnyDesk address.
             software (str): Software name to filter nodes that have it installed.
@@ -38,7 +45,7 @@ class APIClient:
         response = requests.get(url, params=params)
         return self._handle_response(response)
 
-    def update_node(self, node_input):
+    def update_node(self, node_input: dict):
         """
         Update a node.
 
@@ -52,13 +59,13 @@ class APIClient:
         response = requests.put(url, json=node_input)
         return self._handle_response(response)
 
-    def get_payments(self, id_=None, user_id=None, status=None, limit=None):
+    def get_payments(self, id_: int = None, user_id: int = None, status: str = None, limit: int = None):
         """
         Retrieve payments based on provided filters.
 
         Parameters:
-            id_ (str): Payment ID.
-            user_id (str): User ID.
+            id_ (int): Payment ID.
+            user_id (int): User ID.
             status (str): Payment status.
             limit (int): Limit the number of results.
 
@@ -76,7 +83,7 @@ class APIClient:
         response = requests.get(url, params=params)
         return self._handle_response(response)
 
-    def create_payment_ticket(self, user_id, amount):
+    def create_payment_ticket(self, user_id: int, amount: float):
         """
         Create a payment ticket.
 
@@ -92,12 +99,12 @@ class APIClient:
         response = requests.post(url, json=payload)
         return self._handle_response(response)
 
-    def complete_payment(self, id_):
+    def complete_payment(self, id_: int):
         """
         Complete a payment.
 
         Parameters:
-            id_ (str): Payment ID.
+            id_ (int): Payment ID.
 
         Returns:
             Confirmation of payment completion.
@@ -107,12 +114,12 @@ class APIClient:
         response = requests.post(url, params=params)
         return self._handle_response(response)
 
-    def cancel_payment(self, id_):
+    def cancel_payment(self, id_: int):
         """
         Cancel a payment.
 
         Parameters:
-            id_ (str): Payment ID.
+            id_ (int): Payment ID.
 
         Returns:
             Confirmation of payment cancellation.
@@ -122,13 +129,13 @@ class APIClient:
         response = requests.post(url, params=params)
         return self._handle_response(response)
 
-    def get_users(self, id_=None, telegram_id=None, limit=None):
+    def get_users(self, id_: int = None, telegram_id: int = None, limit: int = None):
         """
         Retrieve users based on provided filters.
 
         Parameters:
-            id_ (str): User ID.
-            telegram_id (str): Telegram ID.
+            id_ (int): User ID.
+            telegram_id (int): Telegram ID.
             limit (int): Limit the number of results.
 
         Returns:
@@ -144,7 +151,7 @@ class APIClient:
         response = requests.get(url, params=params)
         return self._handle_response(response)
 
-    def create_or_update_user(self, user_input):
+    def create_or_update_user(self, user_input: dict):
         """
         Create or update a user.
 
