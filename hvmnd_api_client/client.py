@@ -285,9 +285,12 @@ class APIClient:
                 return json_data
         if 404 == response.status_code:
             self.logger.debug(json_data.get('error', response.reason))
-            return None
+            return {
+                'success': False,
+                'error': json_data.get('error', response.reason),
+                'data': [None]
+            }
         else:
-            # Handle error status codes
             error_message = json_data.get('error', response.reason)
             self.logger.debug(error_message)
             raise Exception(f"API Error: {error_message}")
