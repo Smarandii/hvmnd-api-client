@@ -56,7 +56,7 @@ class APIClient:
             Confirmation message.
         """
         url = f"{self.base_url}/nodes"
-        response = requests.put(url, json=node_input)
+        response = requests.patch(url, json=node_input)
         return self._handle_response(response)
 
     def get_payments(self, id_: int = None, user_id: int = None, status: str = None, limit: int = None):
