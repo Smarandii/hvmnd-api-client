@@ -288,7 +288,7 @@ class APIClient:
             return {
                 'success': False,
                 'error': json_data.get('error', response.reason),
-                'data': [None]
+                'data': []
             }
         else:
             error_message = json_data.get('error', response.reason)
