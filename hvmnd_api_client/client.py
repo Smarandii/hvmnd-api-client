@@ -129,13 +129,20 @@ class APIClient:
         response = requests.post(url, params=params)
         return self._handle_response(response)
 
-    def get_users(self, id_: int = None, telegram_id: int = None, limit: int = None):
+    def get_users(
+        self,
+        id_: int = None,
+        telegram_id: int = None,
+        username: str = None,
+        limit: int = None
+    ):
         """
         Retrieve users based on provided filters.
 
         Parameters:
             id_ (int): User ID.
             telegram_id (int): Telegram ID.
+            username (str): Telegram Username.
             limit (int): Limit the number of results.
 
         Returns:
@@ -145,7 +152,8 @@ class APIClient:
         params = {
             'id': id_,
             'telegram_id': telegram_id,
-            'limit': limit,
+            'username': username,
+            'limit': limit
         }
         params = {k: v for k, v in params.items() if v is not None}
         response = requests.get(url, params=params)
