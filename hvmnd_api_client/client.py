@@ -196,12 +196,12 @@ class APIClient:
             response.raise_for_status()
             raise Exception(f"Invalid response: {response.text}")
 
-        if response.status_code >= 200 and response.status_code < 300:
+        if 200 <= response.status_code < 300:
             if not json_data.get('success', False):
                 error_message = json_data.get('error', 'Unknown error')
                 raise Exception(f"API Error: {error_message}")
             else:
-                return json_data.get('data')
+                return json_data
         else:
             # Handle error status codes
             error_message = json_data.get('error', response.reason)
