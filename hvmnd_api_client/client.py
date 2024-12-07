@@ -1,3 +1,4 @@
+import hashlib
 import requests
 
 
@@ -184,7 +185,77 @@ class APIClient:
         response = requests.get(url)
         return response.status_code == 200
 
-    def _handle_response(self, response):
+    def save_hash_mapping(self, question: str, answer: str):
+        """
+        Save a hash mapping for a question and answer.
+
+        Parameters:
+            question (str): The question text.
+            answer (str): The answer text.
+
+        Returns:
+            dict: Response data, including the hash.
+        """
+        url = f"{self.base_url}/quiz/save-hash"
+        payload = {"question": question, "answer": answer}
+        response = requests.post(url, json=payload)
+        return self._handle_response(response)
+
+    def get_question_answer_by_hash(self, answer_hash: str):
+        """
+        Retrieve a question and answer using the hash.
+
+        Parameters:
+            answer_hash (str): The hash value.
+
+        Returns:
+            dict: The question and answer.
+        """
+        url = f"{self.base_url}/quiz/get-question-answer"
+        params = {"hash": answer_hash}
+        response = requests.get(url, params=params)
+        return self._handle_response(response)
+
+    def save_user_answer(self, telegram_id: int, question: str, answer: str):
+        """
+        Save a user's answer to a question.
+
+        Parameters:
+            telegram_id (int): The Telegram ID of the user.
+            question (str): The question text.
+            answer (str): The answer text.
+
+        Returns:
+            dict: Response data.
+        """
+        url = f"{self.base_url}/quiz/save-answer"
+        payload = {
+            "telegram_id": telegram_id,
+            "question": question,
+            "answer": answer
+        }
+        response = requests.post(url, json=payload)
+        return self._handle_response(response)
+
+    # --- Utility Methods ---
+    @staticmethod
+    def generate_hash(question: str, answer: str) -> str:
+        """
+        Generate a hash for a question and answer.
+
+        Parameters:
+            question (str): The question text.
+            answer (str): The answer text.
+
+        Returns:
+            str: A 32-character hash.
+        """
+        data = question + answer
+        hash_object = hashlib.sha256(data.encode())
+        return hash_object.hexdigest()[:32]
+
+    @staticmethod
+    def _handle_response(response):
         """
         Handle the API response.
 
