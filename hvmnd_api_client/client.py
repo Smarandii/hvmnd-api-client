@@ -1,4 +1,6 @@
 import hashlib
+import logging
+
 import requests
 
 
@@ -11,6 +13,7 @@ class APIClient:
             base_url (str): The base URL of the API (e.g., 'http://localhost:8080').
         """
         self.base_url = base_url
+        self.logger = logging.getLogger("hvmnd_api_client")
 
     def get_nodes(
         self,
@@ -254,8 +257,7 @@ class APIClient:
         hash_object = hashlib.sha256(data.encode())
         return hash_object.hexdigest()[:32]
 
-    @staticmethod
-    def _handle_response(response):
+    def _handle_response(self, response):
         """
         Handle the API response.
 
@@ -281,7 +283,11 @@ class APIClient:
                 raise Exception(f"API Error: {error_message}")
             else:
                 return json_data
+        if 404 == response.status_code:
+            self.logger.debug(json_data.get('error', response.reason))
+            return None
         else:
             # Handle error status codes
             error_message = json_data.get('error', response.reason)
+            self.logger.debug(error_message)
             raise Exception(f"API Error: {error_message}")
