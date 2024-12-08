@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='hvmnd_api_client',
-    version='2.6.2',
+    version='2.7.1',
     description='Python client library for the Go API application.',
     long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
@@ -11,6 +11,7 @@ setup(
     url='https://github.com/Smarandii/hvmnd-api-client',
     packages=find_packages(),
     install_requires=[
+        'pytz>=2024.1'
         'requests>=2.0.0',
     ],
     extras_require={

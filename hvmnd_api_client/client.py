@@ -1,3 +1,4 @@
+import pytz
 import hashlib
 import logging
 import datetime
@@ -56,18 +57,25 @@ class APIClient:
 
         return response
 
-    def update_node(self, node_input: dict):
+    def update_node(self, node: dict):
         """
         Update a node.
 
         Parameters:
-            node_input (dict): Node data to update.
+            node (dict): Node data to update.
 
         Returns:
             Confirmation message.
         """
+
         url = f"{self.base_url}/nodes"
-        response = requests.patch(url, json=node_input)
+
+        if node['rent_start_time']:
+            node['rent_start_time'] = node['rent_start_time'].isoformat().replace('+00:00', 'Z')
+        if node['last_balance_update_timestamp']:
+            node['last_balance_update_timestamp'] = node['last_balance_update_timestamp'].isoformat().replace('+00:00', 'Z')
+
+        response = requests.patch(url, json=node)
         return self._handle_response(response)
 
     def get_payments(self, id_: int = None, user_id: int = None, status: str = None, limit: int = None):
@@ -256,20 +264,23 @@ class APIClient:
 
     # --- Utility Methods ---
 
-    @staticmethod
-    def _parse_timestamptz_field(data: dict, field_name: str):
+    def _parse_timestamptz_field(self, data: dict, field_name: str):
         """
-        Convert a timestamptz field in ISO 8601 format to a datetime object.
+        Convert a timestamptz field in ISO 8601 format to a datetime object with timezone support.
 
         Parameters:
             data (dict): The dictionary containing the field.
             field_name (str): The name of the field to convert.
+
+        Returns:
+            None: Modifies the `data` dictionary in place.
         """
         if field_name in data and data[field_name]:
             try:
-                data[field_name] = datetime.datetime.fromisoformat(data[field_name].replace("Z", "+00:00"))
+                data[field_name] = datetime.datetime.fromisoformat(data[field_name])
             except Exception as e:
-                logging.debug(f"Failed to parse field {field_name}: {e}")
+                self.logger.debug(f"Failed to parse field {field_name} ('{data[field_name]}'): {e}")
+                data[field_name] = None
 
     @staticmethod
     def generate_hash(question: str, answer: str) -> str:
