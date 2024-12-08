@@ -135,9 +135,8 @@ class APIClient:
         Returns:
             Confirmation of payment completion.
         """
-        url = f"{self.base_url}/payments/complete"
-        params = {'id': id_}
-        response = requests.post(url, params=params)
+        url = f"{self.base_url}/payments/complete/{id_}"
+        response = requests.patch(url)
         return self._handle_response(response)
 
     def cancel_payment(self, id_: int):
@@ -150,9 +149,8 @@ class APIClient:
         Returns:
             Confirmation of payment cancellation.
         """
-        url = f"{self.base_url}/payments/cancel"
-        params = {'id': id_}
-        response = requests.post(url, params=params)
+        url = f"{self.base_url}/payments/cancel/{id_}"
+        response = requests.patch(url)
         return self._handle_response(response)
 
     def get_users(
