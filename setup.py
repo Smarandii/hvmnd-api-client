@@ -11,7 +11,7 @@ setup(
     url='https://github.com/Smarandii/hvmnd-api-client',
     packages=find_packages(),
     install_requires=[
-        'pytz>=2024.1'
+        'pytz>=2024.1',
         'requests>=2.0.0',
     ],
     extras_require={
