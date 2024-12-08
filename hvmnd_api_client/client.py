@@ -1,6 +1,6 @@
 import hashlib
 import logging
-
+import datetime
 import requests
 
 
@@ -46,8 +46,15 @@ class APIClient:
         }
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}
-        response = requests.get(url, params=params)
-        return self._handle_response(response)
+        response = self._handle_response(requests.get(url, params=params))
+
+        nodes = response['data']
+        for node in nodes:
+            self._parse_timestamptz_field(node, 'rent_start_time')
+            self._parse_timestamptz_field(node, 'last_balance_update_timestamp')
+        response['data'] = nodes
+
+        return response
 
     def update_node(self, node_input: dict):
         """
@@ -84,8 +91,15 @@ class APIClient:
             'limit': limit,
         }
         params = {k: v for k, v in params.items() if v is not None}
-        response = requests.get(url, params=params)
-        return self._handle_response(response)
+
+        response = self._handle_response(requests.get(url, params=params))
+
+        nodes = response['data']
+        for node in nodes:
+            self._parse_timestamptz_field(node, 'datetime')
+        response['data'] = nodes
+
+        return response
 
     def create_payment_ticket(self, user_id: int, amount: float):
         """
@@ -241,6 +255,22 @@ class APIClient:
         return self._handle_response(response)
 
     # --- Utility Methods ---
+
+    @staticmethod
+    def _parse_timestamptz_field(data: dict, field_name: str):
+        """
+        Convert a timestamptz field in ISO 8601 format to a datetime object.
+
+        Parameters:
+            data (dict): The dictionary containing the field.
+            field_name (str): The name of the field to convert.
+        """
+        if field_name in data and data[field_name]:
+            try:
+                data[field_name] = datetime.datetime.fromisoformat(data[field_name].replace("Z", "+00:00"))
+            except Exception as e:
+                logging.debug(f"Failed to parse field {field_name}: {e}")
+
     @staticmethod
     def generate_hash(question: str, answer: str) -> str:
         """
